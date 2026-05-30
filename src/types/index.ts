@@ -13,7 +13,7 @@ export interface Property {
   anh: string;
   tag?: string;
   tagColor?: string;
-  ngayDang?: string;
+  ngayDang?: string; // Đã thêm: Bắt buộc khai báo trường này để Next.js nhận dữ liệu ngày
   isMatTien?: string | boolean;
   videoUrl?: string;
   linkMap?: string;
