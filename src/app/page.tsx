@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import PropertyModal from '@/components/PropertyModal';
 import { Property } from '@/types';
-import { MapPin, PlusCircle, ShieldCheck, Building2, Map, Car, Phone, MessageSquare } from 'lucide-react';
+import { MapPin, PlusCircle, ShieldCheck, X, PenTool } from 'lucide-react';
 
 const GOOGLE_SHEET_CSV = "https://docs.google.com/spreadsheets/d/1-LupBV6uNuUitz4vF6pFv6MupuVDMujafqhjQBNNPTA/export?format=csv";
 
@@ -10,12 +10,20 @@ export default function Home() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [filtered, setFiltered] = useState<Property[]>([]);
   const [selectedProp, setSelectedProp] = useState<Property | null>(null);
+  
+  // State để quản lý ẩn/hiện Modal Ký Gửi
+  const [showKyGuiModal, setShowKyGuiModal] = useState(false);
 
   const [khuVuc, setKhuVuc] = useState('all');
   const [loaiHinh, setLoaiHinh] = useState('all');
   const [gia, setGia] = useState('all');
   const [huong, setHuong] = useState('all');
   const [activeTag, setActiveTag] = useState('all');
+
+  // Các trường thông tin của Form Ký Gửi
+  const [kgTen, setKgTen] = useState('');
+  const [kgDiaChi, setKgDiaChi] = useState('');
+  const [kgGia, setKgGia] = useState('');
 
   useEffect(() => {
     async function getSheetData() {
@@ -30,7 +38,6 @@ export default function Home() {
         for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;
           const currentLine: string[] = [];
-
           let insideQuote = false;
           let entries = "";
           for (let j = 0; j < lines[i].length; j++) {
@@ -79,6 +86,23 @@ export default function Home() {
     setFiltered(result);
   }, [khuVuc, loaiHinh, gia, huong, activeTag, properties]);
 
+  // Hàm xử lý gửi form ký gửi giống 100% file HTML cũ
+  const handleKyGuiSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mucGia = kgGia || "Thương lượng";
+    const tinNhan = `Chào anh Huy, tôi muốn ký gửi nhà đất với thông tin:\n- Liên hệ: ${kgTen}\n- Địa chỉ: ${kgDiaChi}\n- Giá mong muốn: ${mucGia}`;
+    
+    navigator.clipboard.writeText(tinNhan).then(() => {
+      alert("📋 Đã tự động sao chép thông tin ký gửi!\nHệ thống đang mở Zalo anh Huy, bạn chỉ cần bấm chọn 'DÁN' (Paste) và gửi đi là xong ngay nhé.");
+      window.open("https://zalo.me/0931555551", "_blank");
+      setShowKyGuiModal(false);
+      setKgTen(''); setKgDiaChi(''); setKgGia('');
+    }).catch(() => {
+      window.open("https://zalo.me/0931555551", "_blank");
+      setShowKyGuiModal(false);
+    });
+  };
+
   return (
     <>
       {/* HEADER */}
@@ -95,7 +119,8 @@ export default function Home() {
             <a href="#" className="hover:text-slate-900 transition-all">Trang Chủ</a>
             <a href="#listing-section" className="hover:text-slate-900 transition-all">Nhà Đất Đang Bán</a>
           </nav>
-          <button className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold text-sm px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+          {/* ĐÃ SỬA: Thêm sự kiện onClick để mở Modal */}
+          <button onClick={() => setShowKyGuiModal(true)} className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold text-sm px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm active:scale-95">
             <PlusCircle className="w-4 h-4" /> Ký Gửi Nhanh
           </button>
         </div>
@@ -111,6 +136,7 @@ export default function Home() {
             <h2 className="text-4xl sm:text-6xl font-extrabold leading-tight mb-6">Nhà Thật • Giá Thật • Giao Dịch Minh Bạch</h2>
             <div className="flex flex-wrap gap-4">
               <a href="tel:0931555551" className="bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-3.5 rounded-2xl font-extrabold shadow-lg">Liên Hệ Tư Vấn</a>
+              <button onClick={() => setShowKyGuiModal(true)} className="border border-white/20 hover:bg-white/10 px-6 py-3.5 rounded-2xl font-bold transition-all">Ký Gửi Trực Tuyến</button>
             </div>
           </div>
         </div>
@@ -146,9 +172,9 @@ export default function Home() {
             </select>
           </div>
           <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-100 items-center">
-            <button onClick={() => setActiveTag('all')} className={`text-xs font-bold px-4 py-2 rounded-xl \${activeTag === 'all' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>Tất Cả</button>
-            <button onClick={() => setActiveTag('mattien')} className={`text-xs font-bold px-4 py-2 rounded-xl \${activeTag === 'mattien' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>Mặt Tiền Kinh Doanh</button>
-            <button onClick={() => setActiveTag('chinhchu')} className={`text-xs font-bold px-4 py-2 rounded-xl \${activeTag === 'chinhchu' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>Hàng Chính Chủ</button>
+            <button onClick={() => setActiveTag('all')} className={`text-xs font-bold px-4 py-2 rounded-xl ${activeTag === 'all' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>Tất Cả</button>
+            <button onClick={() => setActiveTag('mattien')} className={`text-xs font-bold px-4 py-2 rounded-xl ${activeTag === 'mattien' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>Mặt Tiền Kinh Doanh</button>
+            <button onClick={() => setActiveTag('chinhchu')} className={`text-xs font-bold px-4 py-2 rounded-xl ${activeTag === 'chinhchu' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-600'}`}>Hàng Chính Chủ</button>
           </div>
         </div>
       </section>
@@ -163,7 +189,7 @@ export default function Home() {
               <article key={item.id} onClick={() => setSelectedProp(item)} className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer transform hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                   <img src={imgTarget} alt={item.tieude} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <span className={`absolute top-3 left-3 \${item.tagColor || 'bg-slate-900'} text-white font-bold text-[10px] uppercase px-2.5 py-1 rounded-lg shadow-sm`}>{item.tag || 'Bán Nhà'}</span>
+                  <span className={`absolute top-3 left-3 ${item.tagColor || 'bg-slate-900'} text-white font-bold text-[10px] uppercase px-2.5 py-1 rounded-lg shadow-sm`}>{item.tag || 'Bán Nhà'}</span>
                   <span className="absolute bottom-3 right-3 bg-slate-900/90 text-white font-extrabold text-sm px-3 py-1 rounded-xl shadow-md">{item.gia}</span>
                 </div>
                 <div className="p-5 flex-1 flex flex-col justify-between">
@@ -180,7 +206,41 @@ export default function Home() {
         </div>
       </main>
 
+      {/* POPUP CHI TIẾT BẤT ĐỘNG SẢN */}
       <PropertyModal property={selectedProp} onClose={() => setSelectedProp(null)} />
+
+      {/* ĐÃ THÊM: POPUP KÝ GỬI NHANH */}
+      {showKyGuiModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl p-6 relative">
+            <button onClick={() => setShowKyGuiModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+              <X className="w-4 h-4" />
+            </button>
+            <h3 className="font-extrabold text-slate-900 text-base mb-1 flex items-center gap-2">
+              <PenTool className="text-amber-500 w-4 h-4" /> Ký Gửi Nhanh Trong 10s
+            </h3>
+            <p className="text-xs text-slate-400 mb-4">Thông tin đăng ký sẽ tự động soạn thảo để gửi trực tiếp sang ứng dụng Zalo của anh Huy.</p>
+            
+            <form onSubmit={handleKyGuiSubmit} className="space-y-3 text-sm">
+              <div>
+                <label className="block font-bold text-slate-600 mb-1">Tên & SĐT Liên Hệ *</label>
+                <input type="text" required value={kgTen} onChange={e => setKgTen(e.target.value)} placeholder="Ví dụ: Anh Nam - 0905..." className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-500" />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-600 mb-1">Địa Chỉ Nhà Đất Ký Gửi *</label>
+                <input type="text" required value={kgDiaChi} onChange={e => setKgDiaChi(e.target.value)} placeholder="Số nhà, tên đường, tên quận..." className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-500" />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-600 mb-1">Giá Bán Mong Muốn</label>
+                <input type="text" value={kgGia} onChange={e => setKgGia(e.target.value)} placeholder="Ví dụ: 3.5 Tỷ (Để trống nếu muốn thương lượng)" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-500" />
+              </div>
+              <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl py-3 text-sm mt-3 shadow-md transition-all active:scale-95">
+                Xác Nhận Ký Gửi
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer className="bg-slate-950 text-slate-400 text-xs mt-auto border-t border-slate-900">
