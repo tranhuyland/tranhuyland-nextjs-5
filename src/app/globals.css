@@ -4,6 +4,8 @@
 
 html { scroll-behavior: smooth; }
 body { background-color: #F8FAFC; color: #0f172a; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
@@ -12,9 +14,11 @@ body { background-color: #F8FAFC; color: #0f172a; }
               url('https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1800&auto=format&fit=crop');
   background-size: cover; background-position: center;
 }
+.card-hover { transition: .35s ease; }
+.card-hover:hover { transform: translateY(-6px); }
+.floating { animation: floating 2s ease-in-out infinite; }
 @keyframes floating {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-6px); }
   100% { transform: translateY(0px); }
 }
-.floating { animation: floating 2s ease-in-out infinite; }
