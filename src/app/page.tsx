@@ -39,6 +39,7 @@ export default function Home() {
     desc: "Mua bán, ký gửi nhà đất chính chủ uy tín tại Hải Châu, Cẩm Lệ, Đà Nẵng. Cập nhật giỏ hàng thực tế mỗi ngày: Nhà mặt tiền Cẩm Bá Thước, nhà kiệt ô tô Cách Mạng Tháng 8. Pháp lý minh bạch, có sẵn sổ đỏ bản vẽ xem ngay."
   });
 
+  // Hàm chuẩn hóa chuỗi ngày lấy từ Google Sheet thành Object Date của Javascript
   function chuyenDoiNgayThangChuan(ngayDangStr: any) {
     if (!ngayDangStr) return null;
     const chuoiSach = ngayDangStr.toString().replace(/[\r\n\t]/g, "").trim();
@@ -56,6 +57,7 @@ export default function Home() {
     return null;
   }
 
+  // Hàm tính toán thời gian đăng
   function tinhThoiGianCachDay(ngayDangStr: any) {
     const ngayDang = chuyenDoiNgayThangChuan(ngayDangStr);
     if (!ngayDang) return "Tin mới";
@@ -240,7 +242,7 @@ export default function Home() {
               Chuyên phân phối nhà phố, đất nền, mặt tiền kinh doanh và nhà kiệt ô tô tại Hải Châu, Cẩm Lệ, Sơn Trà... Hình ảnh khảo sát thực tế, hỗ trợ đối chiếu sổ đỏ trực tiếp từ chủ nhà.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="tel:0931555551" className="bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-3.5 rounded-2xl font-extrabold transition-all shadow-lg active:scale-95">Liên Hệ Tư Vấn</a>
+              <a href="tel:0931555551" className="bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-3.5 rounded-2xl font-extrabold shadow-lg">Liên Hệ Tư Vấn</a>
               <a href="https://zalo.me/0931555551" target="_blank" className="border border-white/20 hover:bg-white/10 px-6 py-3.5 rounded-2xl font-bold transition-all flex items-center gap-2">Xem Giỏ Hàng Zalo</a>
             </div>
           </div>
@@ -329,7 +331,7 @@ export default function Home() {
                     </span>
                   )}
                   
-                  {/* NẮP PHỤ BỔ SUNG: Thanh thời gian đăng tinh tế góc dưới trái ảnh */}
+                  {/* Ngày đăng lơ lửng trên ảnh */}
                   <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1">
                     <Clock className="w-3 h-3 text-amber-400" /> {vanBanCachDay}
                   </span>
@@ -344,10 +346,10 @@ export default function Home() {
                     </div>
                     <h3 className="font-bold text-slate-900 line-clamp-2 group-hover:text-amber-500 text-sm sm:text-base leading-snug transition-colors">{item.tieude}</h3>
                     
-                    {/* ĐP ED: HIỂN THỊ NGÀY ĐĂNG SẢN PHẨM RÕ RÀNG Ở NGOÀI CARD DANH SÁCH */}
+                    {/* ĐÃ BẬT: Hiển thị Ngày đăng sản phẩm ở ngay dưới tiêu đề */}
                     {ngayDinhDangNho && (
                       <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-400 font-medium">
-                        <Calendar className="w-3 h-3" /> <span>Ngày đăng: {ngayDinhDangNho}</span>
+                        <Calendar className="w-3 h-3 text-slate-400" /> <span>Ngày đăng: {ngayDinhDangNho}</span>
                       </div>
                     )}
                   </div>
@@ -506,7 +508,7 @@ export default function Home() {
         <a href="tel:0931555551" className="w-14 h-14 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center shadow-2xl floating"><Phone className="w-5 h-5 text-slate-900 fill-slate-900/10" /></a>
       </div>
 
-      {/* NATIVE APP STYLE DETAIL MODAL */}
+      {/* DETAIL MODAL WITH SWIPE BACK TO CLOSE */}
       {selectedProp && (
         <div className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div ref={modalRef} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] sm:max-h-[88vh] flex flex-col animate-in slide-in-from-bottom duration-300">
