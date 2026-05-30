@@ -39,11 +39,13 @@ export default function Home() {
     desc: "Mua bán, ký gửi nhà đất chính chủ uy tín tại Hải Châu, Cẩm Lệ, Đà Nẵng. Cập nhật giỏ hàng thực tế mỗi ngày: Nhà mặt tiền Cẩm Bá Thước, nhà kiệt ô tô Cách Mạng Tháng 8. Pháp lý minh bạch, có sẵn sổ đỏ bản vẽ xem ngay."
   });
 
-  // Hàm chuẩn hóa chuỗi ngày lấy từ Google Sheet thành Object Date của Javascript
+  // ĐÃ SỬA: Hàm bóc tách ngày tháng được nâng cấp để chấp nhận mọi kiểu chuỗi thô từ Excel
   function chuyenDoiNgayThangChuan(ngayDangStr: any) {
     if (!ngayDangStr) return null;
+    // Làm sạch tuyệt đối các ký tự ẩn xuống dòng \r \n từ CSV
     const chuoiSach = ngayDangStr.toString().replace(/[\r\n\t]/g, "").trim();
     if (!chuoiSach) return null;
+
     const parts = chuoiSach.split(/[-/]/);
     if (parts.length === 3) {
       const day = parseInt(parts[0], 10);
@@ -57,7 +59,6 @@ export default function Home() {
     return null;
   }
 
-  // Hàm tính toán thời gian đăng
   function tinhThoiGianCachDay(ngayDangStr: any) {
     const ngayDang = chuyenDoiNgayThangChuan(ngayDangStr);
     if (!ngayDang) return "Tin mới";
@@ -102,9 +103,10 @@ export default function Home() {
             const obj: any = {};
             headers.forEach((h, idx) => {
               let val = currentLine[idx] ? currentLine[idx].replace(/[\"\']/g, "") : "";
+              // ĐÃ SỬA: Ép làm sạch triệt để ký tự xuống dòng ẩn \r cho từng ô dữ liệu đầu vào
+              obj[h] = val.replace(/[\r\n]/g, "").trim();
               if (h === 'id') obj[h] = parseInt(val) || i;
               else if (h === 'soGia') obj[h] = parseFloat(val) || 0;
-              else obj[h] = val.replace(/[\r\n]/g, "").trim();
             });
             dataResult.push(obj as Property);
           }
@@ -331,7 +333,7 @@ export default function Home() {
                     </span>
                   )}
                   
-                  {/* Ngày đăng lơ lửng trên ảnh */}
+                  {/* Khoảng thời gian lơ lửng trên ảnh */}
                   <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1">
                     <Clock className="w-3 h-3 text-amber-400" /> {vanBanCachDay}
                   </span>
@@ -346,7 +348,7 @@ export default function Home() {
                     </div>
                     <h3 className="font-bold text-slate-900 line-clamp-2 group-hover:text-amber-500 text-sm sm:text-base leading-snug transition-colors">{item.tieude}</h3>
                     
-                    {/* ĐÃ BẬT: Hiển thị Ngày đăng sản phẩm ở ngay dưới tiêu đề */}
+                    {/* ĐÃ CỦA ĐỒNG BỘ: Hiển thị Ngày Đăng chuỗi văn bản sạch */}
                     {ngayDinhDangNho && (
                       <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-400 font-medium">
                         <Calendar className="w-3 h-3 text-slate-400" /> <span>Ngày đăng: {ngayDinhDangNho}</span>
@@ -545,7 +547,7 @@ export default function Home() {
                   <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-amber-500" />{selectedProp.khuVucFull}</span>
                   {selectedProp.ngayDang && (
                     <>
-                      <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-slate-400" />Đăng: {selectedProp.ngayDang.toString().replace(/-/g, '/')}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-slate-400" />Đăng: {selectedProp.ngayDang.toString().replace(/[\r\n\t]/g, "").trim().replace(/-/g, '/')}</span>
                       <span className="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-md text-[10px] uppercase">{tinhThoiGianCachDay(selectedProp.ngayDang)}</span>
                     </>
                   )}
@@ -600,3 +602,5 @@ export default function Home() {
     </>
   );
 }
+
+
