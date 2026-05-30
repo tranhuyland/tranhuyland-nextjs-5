@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import PropertyModal from '@/components/PropertyModal';
 import { Property } from '@/types';
-import { MapPin, PlusCircle, ShieldCheck, X, PenTool } from 'lucide-react';
+import { MapPin, PlusCircle, X, PenTool, Phone, FilePlus2, Square, Bed, Compass, ChevronRight } from 'lucide-react';
 
 const GOOGLE_SHEET_CSV = "https://docs.google.com/spreadsheets/d/1-LupBV6uNuUitz4vF6pFv6MupuVDMujafqhjQBNNPTA/export?format=csv";
 
@@ -10,8 +10,6 @@ export default function Home() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [filtered, setFiltered] = useState<Property[]>([]);
   const [selectedProp, setSelectedProp] = useState<Property | null>(null);
-  
-  // State để quản lý ẩn/hiện Modal Ký Gửi
   const [showKyGuiModal, setShowKyGuiModal] = useState(false);
 
   const [khuVuc, setKhuVuc] = useState('all');
@@ -20,7 +18,6 @@ export default function Home() {
   const [huong, setHuong] = useState('all');
   const [activeTag, setActiveTag] = useState('all');
 
-  // Các trường thông tin của Form Ký Gửi
   const [kgTen, setKgTen] = useState('');
   const [kgDiaChi, setKgDiaChi] = useState('');
   const [kgGia, setKgGia] = useState('');
@@ -63,11 +60,35 @@ export default function Home() {
         }
         setProperties(dataResult);
         setFiltered(dataResult);
+
+        // ĐÃ THÊM: Kiểm tra URL xem có ID sản phẩm sẵn không để mở trực tiếp
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentProductId = parseInt(urlParams.get('id') || '');
+        if (currentProductId) {
+          const target = dataResult.find(p => p.id === currentProductId);
+          if (target) setSelectedProp(target);
+        }
+
       } catch (e) {
         console.error(e);
       }
     }
     getSheetData();
+  }, []);
+
+  // ĐÃ THÊM: Theo dõi nút Back của hệ thống để tắt Modal
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentProductId = parseInt(urlParams.get('id') || '');
+      if (!currentProductId) {
+        setSelectedProp(null); // Tắt modal nếu không còn ID trên URL
+        document.body.style.overflow = '';
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   useEffect(() => {
@@ -86,7 +107,24 @@ export default function Home() {
     setFiltered(result);
   }, [khuVuc, loaiHinh, gia, huong, activeTag, properties]);
 
-  // Hàm xử lý gửi form ký gửi giống 100% file HTML cũ
+  // ĐÃ SỬA: Khi bấm mở sản phẩm, đẩy URL ảo giúp tính năng Back/Swipe hoạt động
+  const handleOpenProduct = (item: Property) => {
+    setSelectedProp(item);
+    document.body.style.overflow = 'hidden';
+    window.history.pushState({ id: item.id }, "", `?id=${item.id}`);
+  };
+
+  // ĐÃ SỬA: Khi bấm nút X, chủ động lùi lịch sử để xóa URL ảo
+  const handleCloseProduct = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('id')) {
+      window.history.back();
+    } else {
+      setSelectedProp(null);
+      document.body.style.overflow = '';
+    }
+  };
+
   const handleKyGuiSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const mucGia = kgGia || "Thương lượng";
@@ -119,7 +157,6 @@ export default function Home() {
             <a href="#" className="hover:text-slate-900 transition-all">Trang Chủ</a>
             <a href="#listing-section" className="hover:text-slate-900 transition-all">Nhà Đất Đang Bán</a>
           </nav>
-          {/* ĐÃ SỬA: Thêm sự kiện onClick để mở Modal */}
           <button onClick={() => setShowKyGuiModal(true)} className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold text-sm px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm active:scale-95">
             <PlusCircle className="w-4 h-4" /> Ký Gửi Nhanh
           </button>
@@ -186,10 +223,17 @@ export default function Home() {
             const listAnh = item.anh ? item.anh.split(',') : [];
             const imgTarget = listAnh[0] || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80';
             return (
-              <article key={item.id} onClick={() => setSelectedProp(item)} className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer transform hover:-translate-y-1">
+              <article key={item.id} onClick={() => handleOpenProduct(item)} className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer transform hover:-translate-y-1">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                   <img src={imgTarget} alt={item.tieude} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <span className={`absolute top-3 left-3 ${item.tagColor || 'bg-slate-900'} text-white font-bold text-[10px] uppercase px-2.5 py-1 rounded-lg shadow-sm`}>{item.tag || 'Bán Nhà'}</span>
+                  
+                  {item.huong && (
+                    <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm text-slate-800 font-extrabold text-[10px] px-2.5 py-1 rounded-lg shadow-sm flex items-center gap-1">
+                      <Compass className="w-3 h-3 text-amber-500" />{item.huong}
+                    </span>
+                  )}
+
                   <span className="absolute bottom-3 right-3 bg-slate-900/90 text-white font-extrabold text-sm px-3 py-1 rounded-xl shadow-md">{item.gia}</span>
                 </div>
                 <div className="p-5 flex-1 flex flex-col justify-between">
@@ -199,6 +243,16 @@ export default function Home() {
                     </div>
                     <h3 className="font-bold text-slate-900 line-clamp-2 group-hover:text-amber-500 text-sm sm:text-base leading-snug transition-colors">{item.tieude}</h3>
                   </div>
+
+                  <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-slate-500 text-sm font-medium">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-400">
+                      <span className="flex items-center gap-0.5"><Square className="w-3.5 h-3.5 inline" /> {item.dienTich}</span>
+                      <span className="flex items-center gap-0.5"><Bed className="w-3.5 h-3.5 inline" /> {item.phongNgu || 'Đất ở'}</span>
+                    </div>
+                    <span className="text-amber-500 font-bold flex items-center gap-0.5 text-xs uppercase tracking-wider group-hover:translate-x-0.5 transition-transform">
+                      Chi tiết <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
               </article>
             );
@@ -206,10 +260,10 @@ export default function Home() {
         </div>
       </main>
 
-      {/* POPUP CHI TIẾT BẤT ĐỘNG SẢN */}
-      <PropertyModal property={selectedProp} onClose={() => setSelectedProp(null)} />
+      {/* MODAL CHI TIẾT SẢN PHẨM */}
+      <PropertyModal property={selectedProp} onClose={handleCloseProduct} />
 
-      {/* ĐÃ THÊM: POPUP KÝ GỬI NHANH */}
+      {/* POPUP KÝ GỬI NHANH */}
       {showKyGuiModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl p-6 relative">
@@ -259,6 +313,29 @@ export default function Home() {
           © 2026 Trần Huy Land. Powered by Next.js. All rights reserved.
         </div>
       </footer>
+
+      {/* BOTTOM CONTACT BAR (MOBILE) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 flex gap-3 z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <button onClick={() => setShowKyGuiModal(true)} className="flex-[2] bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold rounded-xl py-3 px-4 flex items-center justify-center gap-1.5 text-sm shadow-sm active:scale-95 transition-all">
+          <FilePlus2 className="w-4 h-4" /> Ký Gửi Nhanh
+        </button>
+        <a href="tel:0931555551" className="flex-[1.5] bg-slate-900 text-white font-bold rounded-xl py-3 px-4 flex items-center justify-center gap-1.5 text-sm transition-transform active:scale-95 shadow-md">
+          <Phone className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> Gọi Ngay
+        </a>
+        <a href="https://zalo.me/0931555551" target="_blank" rel="noopener noreferrer" className="flex-[1.5] bg-[#0068ff] text-white font-bold rounded-xl py-3 px-4 flex items-center justify-center text-sm transition-transform active:scale-95 shadow-md">
+          Zalo
+        </a>
+      </div>
+
+      {/* FLOATING CONTACT BUTTONS (DESKTOP) */}
+      <div className="hidden md:flex fixed bottom-6 right-6 z-40 flex-col gap-3">
+        <a href="https://zalo.me/0931555551" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-full bg-[#0068ff] text-white flex items-center justify-center shadow-2xl font-bold text-sm hover:scale-105 transition-transform" title="Liên hệ qua Zalo">
+          Zalo
+        </a>
+        <a href="tel:0931555551" className="w-14 h-14 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center shadow-2xl floating hover:scale-105 transition-transform" title="Gọi thỏa thuận Hotline ngay">
+          <Phone className="w-5 h-5 text-slate-900 fill-slate-900/10" />
+        </a>
+      </div>
     </>
   );
 }
