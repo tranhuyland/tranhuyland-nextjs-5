@@ -29,7 +29,8 @@ export default function Home() {
 
         for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;
-          const currentLine = [];
+          const currentLine: string[] = [];
+
           let insideQuote = false;
           let entries = "";
           for (let j = 0; j < lines[i].length; j++) {
