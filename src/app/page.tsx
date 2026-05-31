@@ -1,13 +1,12 @@
 import { Metadata } from 'next';
 import { propertyService } from '../../service/propertyService';
-import HomeClient from './HomeClient';
-
+import HomeClient from './HomeClient'; // Gọi giao diện đã rút gọn của anh vào đây
 
 interface Props {
   searchParams: { id?: string };
 }
 
-// Hàm Metadata động chạy độc lập ở Server - An toàn SEO 100%
+// 1. Cấu hình SEO Metadata chạy độc lập ở Server
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const id = searchParams.id;
   const baseUrl = 'https://tranhuyland-nextjs-5.vercel.app';
@@ -58,7 +57,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 }
 
+// 2. Hàm Giao diện gọi file Client gánh vác
 export default function Home() {
-  // Trả về file giao diện Client gánh tương tác
   return <HomeClient />;
 }
