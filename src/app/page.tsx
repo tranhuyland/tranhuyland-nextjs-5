@@ -58,6 +58,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default function Home() {
-  // Trả về file giao diện Client
+  // Trả về file giao diện Client gánh tương tác
   return <HomeClient />;
 }
