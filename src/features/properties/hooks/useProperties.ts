@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { propertyService } from '../../../service/propertyService';
-
+import { propertyService } from '@/service/
 
 export function useProperties(seoGocTitle: string) {
   const [properties, setProperties] = useState<Property[]>([]);
