@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { propertyService } from '../../service/propertyService';
+import { propertyService } from '~/service/propertyService';
+
 import HomeClient from './HomeClient'; // Gọi giao diện đã rút gọn của anh vào đây
 
 interface Props {
