@@ -1,1 +1,34 @@
+import { MetadataRoute } from 'next';
+import { propertyService } from '@/services/propertyService';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = 'https://tranhuyland-nextjs-5.vercel.app';
+
+  // 1. Các trang tĩnh cố định
+  const staticPages = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 1.0,
+    },
+  ];
+
+  // 2. Các trang động lấy từ kho dữ liệu Google Sheet
+  try {
+    const properties = await propertyService.fetchPropertiesFromSheet();
+    
+    const propertyPages = properties.map((item) => ({
+      url: `${baseUrl}/?id=${item.id}`, // Tạm thời dùng query param theo cấu trúc hiện tại của anh
+      lastModified: item.ngayDang ? new Date(item.ngayDang.toString().replace(/[-/]/g, '-')) : new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }));
+
+    return [...staticPages, ...propertyPages];
+  } catch (error) {
+    console.error('Lỗi tạo sitemap động:', error);
+    return staticPages;
+  }
+}
 
