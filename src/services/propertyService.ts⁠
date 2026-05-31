@@ -1,1 +1,46 @@
+import { Property } from "@/types/property";
+import { GOOGLE_SHEET_CSV_URL } from "@/constants/config";
+
+export const propertyService = {
+  fetchPropertiesFromSheet: async (): Promise<Property[]> => {
+    const res = await fetch(`${GOOGLE_SHEET_CSV_URL}&t=${new Date().getTime()}`);
+    if (!res.ok) throw new Error("Không thể kết nối đến kho dữ liệu");
+    
+    const text = await res.text();
+    const lines = text.split('\n');
+    if (lines.length === 0) return [];
+    
+    const headers = lines[0].split(',').map(h => h.trim().replace(/[\"\']/g, ""));
+    const dataResult: Property[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      const currentLine: string[] = [];
+      let insideQuote = false;
+      let entries = "";
+      
+      for (let j = 0; j < lines[i].length; j++) {
+        let char = lines[i][j];
+        if (char === '"') insideQuote = !insideQuote;
+        else if (char === ',' && !insideQuote) { 
+          currentLine.push(entries.trim()); 
+          entries = ""; 
+        } else entries += char;
+      }
+      currentLine.push(entries.trim());
+
+      if (currentLine.length >= headers.length) {
+        const obj: any = {};
+        headers.forEach((h, idx) => {
+          let val = currentLine[idx] ? currentLine[idx].replace(/[\"\']/g, "") : "";
+          obj[h] = val.replace(/[\r\n]/g, "").trim();
+          if (h === 'id') obj[h] = parseInt(val) || i;
+          else if (h === 'soGia') obj[h] = parseFloat(val) || 0;
+        });
+        dataResult.push(obj as Property);
+      }
+    }
+    return dataResult;
+  }
+};
 
