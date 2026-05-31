@@ -1,20 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useProperties } from '../features/properties/hooks/useProperties';
+import { useProperties } from '@/features/properties/hooks/useProperties';
 
-// Đường dẫn lùi 2 cấp chuẩn xác để gọi các file thực tế trên GitHub của anh
-import Hero from '../components/Hero';
-import Footer from '../components/Footer';
-import PropertyModal from '../components/PropertyModal';
-import FilterBar from '../features/properties/components/FilterBar';
-import PropertyGrid from '../features/properties/components/PropertyGrid';
-
+// Gọi trực tiếp từ gốc @/ để bẻ gãy mọi lỗi kẹt bộ nhớ đệm phân cấp
+import Hero from '@/components/Hero';
+import Footer from '@/components/Footer';
+import PropertyModal from '@/components/PropertyModal';
+import FilterBar from '@/features/properties/components/FilterBar';
+import PropertyGrid from '@/features/properties/components/PropertyGrid';
 
 export default function HomeClient() {
   const propLogic = useProperties("Trần Huy Land");
 
-  // Đồng bộ nút Back trên điện thoại khi đóng mở Modal chi tiết
   useEffect(() => {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -29,7 +27,6 @@ export default function HomeClient() {
 
   const baseUrl = 'https://tranhuyland-nextjs-5.vercel.app';
 
-  // Cấu hình Schema văn phòng (Local SEO)
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
@@ -47,7 +44,6 @@ export default function HomeClient() {
     "priceRange": "$$$"
   };
 
-  // Cấu hình Schema sản phẩm động cho từng căn nhà đất
   const currentItem = propLogic.selectedProp;
   const productSchema = currentItem ? {
     "@context": "https://schema.org",
@@ -77,7 +73,6 @@ export default function HomeClient() {
         />
       )}
 
-      {/* Hiển thị cấu trúc giao diện thực tế của anh */}
       <Hero />
       
       <FilterBar 
@@ -97,7 +92,7 @@ export default function HomeClient() {
       
       <Footer />
 
-      {/* Hiển thị hộp thoại chi tiết Bất động sản khi khách bấm vào */}
+      {/* Hiển thị Modal chi tiết */}
       {propLogic.selectedProp && (
         <PropertyModal item={propLogic.selectedProp} onClose={propLogic.handleCloseProduct} />
       )}
