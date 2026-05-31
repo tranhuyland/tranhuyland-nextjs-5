@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Property } from "@/types/property";
+import { propertyService } from '../../../../service/propertyService';⁠
 import { propertyService } from "@/services/propertyService";
 
 export function useProperties(seoGocTitle: string) {
