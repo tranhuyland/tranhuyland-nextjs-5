@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { useProperties } from '../features/properties/hooks/useProperties';
 
 // Đường dẫn lùi 2 cấp chuẩn xác để gọi các file thực tế trên GitHub của anh
-import Hero from '../../components/Hero';
-import Footer from '../../components/Footer';
-import PropertyModal from '../../components/PropertyModal';
-import FilterBar from '../../features/properties/components/FilterBar';
-import PropertyGrid from '../../features/properties/components/PropertyGrid';
+import Hero from '../components/Hero';
+import Footer from '../components/Footer';
+import PropertyModal from '../components/PropertyModal';
+import FilterBar from '../features/properties/components/FilterBar';
+import PropertyGrid from '../features/properties/components/PropertyGrid';
+
 
 export default function HomeClient() {
   const propLogic = useProperties("Trần Huy Land");
