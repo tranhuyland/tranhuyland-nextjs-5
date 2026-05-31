@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { propertyService } from '../services/propertyService';⁠
-import HomeClient from './HomeClient'; // Gọi giao diện Client vào đây
+import { propertyService } from '../services/propertyService';
+import HomeClient from './HomeClient';
 
 interface Props {
   searchParams: { id?: string };
