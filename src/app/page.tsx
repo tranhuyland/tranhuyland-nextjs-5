@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
-import { propertyService } from '../services/propertyService';
+import { propertyService } from 'src/services/propertyService';
 import HomeClient from './HomeClient';
+
 
 interface Props {
   searchParams: { id?: string };
