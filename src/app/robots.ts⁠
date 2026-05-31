@@ -1,1 +1,16 @@
+import { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: [
+        '/api/',       // Chặn quét các tuyến API nội bộ
+        '/*?id=*',     // Chặn quét các URL động dạng tham số nếu đã có cấu trúc dynamic route riêng sau này
+      ],
+    },
+    sitemap: 'https://tranhuyland-nextjs-5.vercel.app/sitemap.xml',
+  };
+}
 
