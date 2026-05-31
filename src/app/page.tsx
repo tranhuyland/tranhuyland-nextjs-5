@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { propertyService } from '../service/propertyService';
+import { propertyService } from 'src/service/propertyService';
 import HomeClient from './HomeClient';
 
 
