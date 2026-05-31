@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useProperties } from '@/features/properties/hooks/useProperties';
+import { useProperties } from '../features/properties/hooks/useProperties';
 
-// Gọi trực tiếp từ gốc @/ để bẻ gãy mọi lỗi kẹt bộ nhớ đệm phân cấp
-import Hero from '@/components/Hero';
-import Footer from '@/components/Footer';
-import PropertyModal from '@/components/PropertyModal';
-import FilterBar from '@/features/properties/components/FilterBar';
-import PropertyGrid from '@/features/properties/components/PropertyGrid';
+// Sửa thành lùi 1 cấp (../) và khớp chuẩn chữ viết thường của các folder con
+import Hero from '../components/Hero';
+import Footer from '../components/Footer';
+import PropertyModal from '../components/PropertyModal';
+import FilterBar from '../features/properties/components/FilterBar';
+import PropertyGrid from '../features/properties/components/PropertyGrid';
 
 export default function HomeClient() {
   const propLogic = useProperties("Trần Huy Land");
@@ -92,7 +92,6 @@ export default function HomeClient() {
       
       <Footer />
 
-      {/* Hiển thị Modal chi tiết */}
       {propLogic.selectedProp && (
         <PropertyModal item={propLogic.selectedProp} onClose={propLogic.handleCloseProduct} />
       )}
